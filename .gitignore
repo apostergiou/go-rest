@@ -12,3 +12,5 @@
 
 # dep vendor
 /vendor
+
+go-rest
