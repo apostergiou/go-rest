@@ -10,6 +10,12 @@ $ ./go-rest
 Usage:
 
 ```shell
-$ curl http://localhost:8000/items
-$ curl http://localhost:8000/items/1
+# Index
+$ curl -i http://localhost:8000/items
+
+# Show
+$ curl -i http://localhost:8000/items/1
+
+# Delete
+curl -i -X DELETE http://localhost:8000/items/1
 ```
