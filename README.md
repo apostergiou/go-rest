@@ -10,6 +10,9 @@ $ ./go-rest
 Usage:
 
 ```shell
+# Main page
+$ curl -i http://localhost:8000/
+
 # Index
 $ curl -i http://localhost:8000/items
 

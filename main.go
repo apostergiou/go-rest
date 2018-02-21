@@ -69,6 +69,9 @@ func main() {
 	items = append(items, Item{ID: "2", Name: "Cofee", Project: &Project{Name: "Work", Notes: "Do not forget!"}})
 	router := mux.NewRouter()
 
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, r.URL.Path[1:])
+	})
 	router.HandleFunc("/items", Index).Methods("GET")
 	router.HandleFunc("/items/{id}", Show).Methods("GET")
 	router.HandleFunc("/items/{id}", Create).Methods("POST")
