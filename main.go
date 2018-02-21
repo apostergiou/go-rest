@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	// TODO use net/http/#ServeMux
 	"github.com/gorilla/mux"
 )
 
@@ -19,38 +18,41 @@ type Project struct {
 	Notes string `json:"notes,omitempty"`
 }
 
-// TODO pass by reference
 var items []Item
 
-func GetItems(w http.ResponseWriter, r *http.Request) {
+func Index(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(items)
 }
 
-func GetItem(w http.ResponseWriter, r *http.Request) {
+func Show(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	found := false
 	for _, item := range items {
 		if item.ID == params["id"] {
+			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(item)
 			found = true
 		}
 	}
+
 	if !found {
-		// TODO use http status
+		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode("Not found")
 	}
 }
 
-func CreateItem(w http.ResponseWriter, r *http.Request) {
+func Create(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var item Item
 	_ = json.NewDecoder(r.Body).Decode(&item)
 	item.ID = params["id"]
 	items = append(items, item)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(items)
 }
 
-func DeleteItem(w http.ResponseWriter, r *http.Request) {
+func Delete(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for index, item := range items {
 		if item.ID == params["id"] {
@@ -58,7 +60,7 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	// TODO handle JSON errors
+	w.WriteHeader(http.StatusNoContent)
 	json.NewEncoder(w).Encode(items)
 }
 
@@ -67,10 +69,10 @@ func main() {
 	items = append(items, Item{ID: "2", Name: "Cofee", Project: &Project{Name: "Work", Notes: "Do not forget!"}})
 	router := mux.NewRouter()
 
-	router.HandleFunc("/items", GetItems).Methods("GET")
-	router.HandleFunc("/items/{id}", GetItem).Methods("GET")
-	router.HandleFunc("/items/{id}", CreateItem).Methods("POST")
-	router.HandleFunc("/items/{id}", DeleteItem).Methods("DELETE")
+	router.HandleFunc("/items", Index).Methods("GET")
+	router.HandleFunc("/items/{id}", Show).Methods("GET")
+	router.HandleFunc("/items/{id}", Create).Methods("POST")
+	router.HandleFunc("/items/{id}", Delete).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
